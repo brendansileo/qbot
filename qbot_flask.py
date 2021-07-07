@@ -1,4 +1,4 @@
-from flask import Flask, Markup, redirect
+from flask import Flask, Markup, redirect, request
 
 from qbot_actions import QbotActions
 
@@ -26,6 +26,11 @@ def dash_list():
 	response += 'Up Next:<br>'
 	response += '<br>'.join(player_list[1:]) if len(player_list) > 1 else 'None'
 	return Markup(response)
+
+@app.route('/auth')
+def auth():
+	code = request.args.get('code')
+	return code
 
 @app.route('/list')
 def list():
