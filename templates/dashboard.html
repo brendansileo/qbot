@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script>
 		function getList() {
@@ -53,6 +54,17 @@
 			);
 		}
 
+		const getCookieValue = (name) => (
+			document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+		)
+
+		var code = getCookieValue('code')
+		if(code.length == 0){
+			//auth
+		}
+		else{
+			//get name
+		}
 		getList()
 		var interval = window.setInterval(function(){
 		  getList()

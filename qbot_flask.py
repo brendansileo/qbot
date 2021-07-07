@@ -1,4 +1,4 @@
-from flask import Flask, Markup, redirect, request
+from flask import Flask, Markup, redirect, request, render_template
 
 from qbot_actions import QbotActions
 
@@ -9,9 +9,7 @@ player_list = []
 
 @app.route('/')
 def dashboard():
-	with open('dashboard.html', 'r') as f:
-		html = f.read()
-	return html
+	return render_template('dashboard.html')
 
 @app.route('/discord')
 def discord():
@@ -29,9 +27,7 @@ def dash_list():
 
 @app.route('/auth')
 def auth():
-	with open('auth.html', 'r') as f:
-                html = f.read()
-        return html
+	return render_template('auth.html')
 
 @app.route('/list')
 def list():
