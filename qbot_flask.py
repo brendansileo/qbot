@@ -29,8 +29,9 @@ def dash_list():
 
 @app.route('/auth')
 def auth():
-	code = request.args.get('code')
-	return code
+	with open('auth.html', 'r') as f:
+                html = f.read()
+        return html
 
 @app.route('/list')
 def list():
