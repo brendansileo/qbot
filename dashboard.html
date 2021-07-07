@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script>
+		function getList() {
+			$.get("/dashlist", 
+				function(data) {
+			       $("#list").html(data);
+			    }
+			);
+		}
+
+		function add() {
+			var name = $("#name").val()
+			$.get("/add/"+name, 
+				function(data) {
+			       getList()
+			    }
+			);
+		}
+
+		function next() {
+			$.get("/next", 
+				function(data) {
+			       getList()
+			    }
+			);
+		}
+
+		function drop() {
+			var name = $("#name").val()
+			$.get("/drop/"+name, 
+				function(data) {
+			       getList()
+			    }
+			);
+		}
+
+		function win() {
+			$.get("/win", 
+				function(data) {
+			       getList()
+			    }
+			);
+		}
+
+		function loss() {
+			$.get("/loss", 
+				function(data) {
+			       getList()
+			    }
+			);
+		}
+
+		getList()
+		var interval = window.setInterval(function(){
+		  getList()
+		}, 1000);
+	</script>
+</head>
+<body>
+
+<a href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/&scope=user_read">Login with Twitch</a>
+
+<h1>List</h1>
+<p id="list">Loading...</p>
+
+Name: <input id="name"/><br>
+<button onclick="add()">Challenge</button><br>
+<button onclick="drop()">Drop</button>
+<button onclick="next()">Next</button>
+<button onclick="win()">Win</button>
+<button onclick="loss()">Loss</button>
+
+</body>
+</html>
