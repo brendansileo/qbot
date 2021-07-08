@@ -48,8 +48,6 @@ def verify():
 		return 'True'
 	else:
 		return str(data)
-	
-
 
 @app.route('/list')
 def list():
@@ -73,6 +71,23 @@ def add(name):
 		else:
 			response = '@'+name+' you will be up in '+str(i)+' matches!'
 	return response
+
+@app.route('/siteadd', methods=['POST'])
+def siteadd():
+	token = request.form['token']
+	name = qa.get_name(token)
+	if name in player_list:
+                response = '@'+name+' you are already in the list!'
+        else:
+                player_list.append(name)
+                i = player_list.index(name)
+                if i == 0:
+                        response = '@'+name+' you are up!'
+                elif i == 1:
+                        response = '@'+name+' you are up next!'
+                else:
+                        response = '@'+name+' you will be up in '+str(i)+' matches!'
+        return response	
 
 @app.route('/clear')
 def clear():

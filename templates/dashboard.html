@@ -15,11 +15,12 @@
 		}
 
 		function add() {
-			var name = $("#name").val()
-			$.get("/add/"+name, 
+			token = getCookieValue('token')
+			$.post('/siteadd', 
+				{'token': token},
 				function(data) {
-			       getList()
-			    }
+			       		getList()
+			    	}
 			);
 		}
 
