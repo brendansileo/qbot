@@ -1,5 +1,5 @@
 from flask import Flask, Markup, redirect, request, render_template
-
+import requests
 from qbot_actions import QbotActions
 
 app = Flask(__name__)
@@ -28,6 +28,28 @@ def dash_list():
 @app.route('/auth')
 def auth():
 	return render_template('auth.html')
+
+@app.route('/authtoken', methods=['POST'])
+def authtoken():
+	with open('client_secret', 'r') as f:
+		secret = f.read().strip()
+	code = request.form['code']
+	data = requests.post('https://id.twitch.tv/oauth2/token?client_id=i2k8ufiwoixna3fcmdrt71ij386luw&client_secret='+secret+'&code='+code+'&grant_type=authorization_code&redirect_uri=https://itsmino.tk/auth')
+	return data.json()['access_token']	
+
+@app.route('/verify', methods=['POST'])
+def verify():
+	token = request.form['token']
+	name = request.form['name']
+	if len(token) == 0 or len(name) == 0: 
+		return token+':'+name
+	data = requests.get('https://api.twitch.tv/helix/users', headers={'Client-Id': 'i2k8ufiwoixna3fcmdrt71ij386luw', 'Authorization': 'Bearer '+token})
+	if name == data.json()['data'][0]['display_name']:
+		return 'True'
+	else:
+		return str(data)
+	
+
 
 @app.route('/list')
 def list():

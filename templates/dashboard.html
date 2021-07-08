@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script>
@@ -58,23 +60,61 @@
 			document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
 		)
 
-		var code = getCookieValue('code')
-		if(code.length == 0){
-			//auth
+		function setCookie(name, value, days = 365, path = '/') {
+                        const expires = new Date(Date.now() + days * 864e5).toUTCString()
+                        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=' + path                
 		}
-		else{
-			//get name
+
+		function eraseCookie(name) {   
+			document.cookie = name+'=; Max-Age=-99999999;';  
 		}
-		getList()
-		var interval = window.setInterval(function(){
-		  getList()
-		}, 1000);
+
+		function go() {
+			var token = getCookieValue('token')
+			var name = getCookieValue('name')
+			$.post('/verify', {'token':token, 'name':name}, function(resp){
+				if(resp == 'True'){
+					$('#welcome').html('Welcome ' + name +'!')
+                                        $('#welcome').show()
+				}
+				else{
+					eraseCookie('token')
+					eraseCookie('name')
+					var code = getCookieValue('code')
+                        		eraseCookie('code')
+		                        if(code.length == 0){
+                		                $('#login').show()
+                        		}
+					else{
+						$.post('/authtoken', {'code':code}, function(token){
+							setCookie('token', token)
+							$.ajax({
+								type: 'GET',
+								url: 'https://api.twitch.tv/helix/users',
+								headers: {'Authorization': 'Bearer ' + token, 'Client-Id': 'i2k8ufiwoixna3fcmdrt71ij386luw'},
+		                                                success: function(data) {
+		                                                        setCookie('name', data['data'][0]['display_name'])
+		                                                        $('#welcome').html('Welcome ' + data['data'][0]['display_name']+'!')
+									$('#welcome').show()
+								}
+							});
+						})
+					}
+				}
+			})
+
+			getList()
+			var interval = window.setInterval(function(){
+			  getList()
+			}, 1000);
+		}
+		window.onload = go
 	</script>
 </head>
 <body>
 
-<a href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read">Login with Twitch</a>
-
+<a id="login" style="display:none" href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read">Login With Twitch</a>
+<p id="welcome" style="display:none"></p>
 <h1>List</h1>
 <p id="list">Loading...</p>
 
