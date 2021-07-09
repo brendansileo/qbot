@@ -18,10 +18,10 @@ def discord():
 @app.route('/dashlist')
 def dash_list():
 	if len(player_list) == 0:
-		return 'The list is empty! Use !challenge to join!'
-	response = 'On Stream: <br>'
+		return 'The list is empty!'
+	response = '<b>On Stream:</b> <br>'
 	response += player_list[0]+'<br>'
-	response += 'Up Next:<br>'
+	response += '<b>Up Next:</b><br>'
 	response += '<br>'.join(player_list[1:]) if len(player_list) > 1 else 'None'
 	return Markup(response)
 
@@ -48,6 +48,17 @@ def verify():
 		return 'True'
 	else:
 		return str(data)
+
+@app.route('/getRecord', methods=['POST'])
+def getRecord():
+	token = request.form['token']
+	name = qa.get_name(token)
+	data = qa.db.read()
+	if name in data:
+	        response = str(data[name]['wins'])+'W-'+str(data[name]['losses'])+'L'	
+	else:
+		response = '0W-0L'
+	return response
 
 @app.route('/list')
 def list():
@@ -95,6 +106,17 @@ def clear():
 		player_list.pop()
 	return 'The list has been cleared'
 
+@app.route('/siteclear', methods=['POST'])
+def siteclear():
+	token = request.form['token']
+        name = qa.get_name(token)
+        if name != 'its_mino_':
+                return 'Auth failed'
+        else:
+		while len(player_list) > 0:
+			player_list.pop()
+	return 'The list has been cleared'
+
 @app.route('/drop/<name>')
 def drop(name):
 	try:
@@ -104,6 +126,17 @@ def drop(name):
 		response = '@'+name+' is not in the list!'
 	return response
 
+@app.route('/sitedrop', methods=['POST'])
+def sitedrop():
+	token = request.form['token']
+	name = qa.get_name(token)
+	try:
+                player_list.remove(name)
+                response = 'Removed @'+name+' from the list'
+        except:
+                response = '@'+name+' is not in the list!'
+        return response
+
 @app.route('/next')
 def next():
 	last = player_list.pop(0)
@@ -111,6 +144,19 @@ def next():
 	if len(player_list) > 0:
 		 response += ' @'+player_list[0]+' is up next!'
 	return response
+
+@app.route('/sitenext', methods=['POST'])
+def sitenext():
+	token = request.form['token']
+	name = qa.get_name(token)
+	if name != 'its_mino_':
+		return 'Auth failed'
+	else:
+		last = player_list.pop(0)
+	        response = 'Thanks for playing @'+last+'!' 
+	 	if len(player_list) > 0:                
+			response += ' @'+player_list[0]+' is up next!'
+	        return response
 
 @app.route('/win')
 def win():

@@ -25,36 +25,18 @@
 		}
 
 		function next() {
-			$.get("/next", 
-				function(data) {
-			       getList()
-			    }
-			);
+			token = getCookieValue('token')                        
+			$.post('/sitenext', {'token': token}, function(data){getList()})
+		}
+
+		function clear() {
+			token = getCookieValue('token')
+			$.post('/siteclear', {'token': token}, function(data){getList()})
 		}
 
 		function drop() {
-			var name = $("#name").val()
-			$.get("/drop/"+name, 
-				function(data) {
-			       getList()
-			    }
-			);
-		}
-
-		function win() {
-			$.get("/win", 
-				function(data) {
-			       getList()
-			    }
-			);
-		}
-
-		function loss() {
-			$.get("/loss", 
-				function(data) {
-			       getList()
-			    }
-			);
+			token = getCookieValue('token')	
+			$.post('/sitedrop', {'token': token}, function(data){getList()})	
 		}
 
 		const getCookieValue = (name) => (
@@ -70,13 +52,29 @@
 			document.cookie = name+'=; Max-Age=-99999999;';  
 		}
 
+		function getRecord() {
+			token = getCookieValue('token')
+			$.post('/getRecord', {'token': token}, function(data){$('#record').html(data)})
+		}
+
+		function showControls(name, token) {
+			if(name == 'its_mino_'){
+				$('.admincontrols').show()
+			}
+			else{
+				$('.usercontrols').show()
+			}
+			var interval = window.setInterval(function(){getRecord()}, 1000)
+			$('#welcome').html('Welcome ' + name +'!')                                       
+			$('#welcome').show()
+		}
+
 		function go() {
 			var token = getCookieValue('token')
 			var name = getCookieValue('name')
 			$.post('/verify', {'token':token, 'name':name}, function(resp){
 				if(resp == 'True'){
-					$('#welcome').html('Welcome ' + name +'!')
-                                        $('#welcome').show()
+					showControls(name, token)
 				}
 				else{
 					eraseCookie('token')
@@ -95,8 +93,7 @@
 								headers: {'Authorization': 'Bearer ' + token, 'Client-Id': 'i2k8ufiwoixna3fcmdrt71ij386luw'},
 		                                                success: function(data) {
 		                                                        setCookie('name', data['data'][0]['display_name'])
-		                                                        $('#welcome').html('Welcome ' + data['data'][0]['display_name']+'!')
-									$('#welcome').show()
+									showControls(data['data'][0]['display_name'], token)
 								}
 							});
 						})
@@ -111,20 +108,81 @@
 		}
 		window.onload = go
 	</script>
+	<style>
+		body {margin:0; text-align: center}
+		ul {
+		  list-style-type: none;
+		  margin: 0;
+		  padding: 0;
+		  overflow: hidden;
+		  background-color: #333;
+		  width: 100%;
+		}
+
+		li {
+		  float: left;
+		  margin-right: 0%;
+		  width: 25%;
+		}
+
+		li a {
+		  font-size: 26px;
+		  display: block;
+		  color: white;
+		  text-align: center;
+		  padding: 14px 16px;
+		  text-decoration: none;
+		}
+
+		li a:hover:not(.active) {
+		  background-color: #111;
+		}
+		.active {
+		  background-color: #64adfa;
+		  color: white;
+		}
+		.active:hover {color:white;}
+		#welcome {
+			text-align: center;
+			font-size:26px;
+			font-weight: bold;
+			margin-top: 25px;
+		}
+		#record {
+			text-align:center;
+			font-size: 20px;
+			font-weight: bold;
+		}
+		#login button {
+			width: 20%;
+			margin-top: 50px;
+			background-color: #64adfa;
+			height: 50px;
+		}
+		h1 {
+			
+		}
+		button{
+			margin-right: 15px;
+		}	
+	</style>
 </head>
 <body>
-
-<a id="login" style="display:none" href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read">Login With Twitch</a>
+<ul>
+	<li><a class="active">Dashboard</a></li>
+	<li><a href="https://twitch.tv/its_mino_" URL>Twitch</a></li>
+	<li><a href="/discord">Discord</a></li>
+	<li><a href="https://twitter.com/_its_mino_" URL>Twitter</a></li>
+</ul>
+<a id="login" style="display:none" href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read"><button>Login With Twitch</button></a>
 <p id="welcome" style="display:none"></p>
-<h1>List</h1>
+<div id="record"></div>
+<br><br><br><br>
+<div class="usercontrols" style="display:none"><button onclick="add()">Challenge</button><button onclick="drop()">Drop</button></div></div>
+<div class="admincontrols" style="display:none"><button onclick="next()">Next</button><button onclick="clear()">Clear</button></div>
+<br><br><br><br>
+<h1>Viewer Battle List</h1>
 <p id="list">Loading...</p>
-
-Name: <input id="name"/><br>
-<button onclick="add()">Challenge</button><br>
-<button onclick="drop()">Drop</button>
-<button onclick="next()">Next</button>
-<button onclick="win()">Win</button>
-<button onclick="loss()">Loss</button>
 
 </body>
 </html>
