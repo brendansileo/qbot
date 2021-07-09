@@ -4,6 +4,7 @@ class QbotDB:
 	inuse = False
 
 	def queue(self):
+		return
 		while self.inuse:
 			pass
 

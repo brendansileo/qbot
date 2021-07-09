@@ -68,6 +68,16 @@ def list():
 	response += ', '.join(player_list[1:2]) if len(player_list) > 1 else 'None'
 	return response
 
+@app.route('/slobslist')
+def slobslist():
+	response = '<html><head><script>setTimeout(function(){window.location.reload(1);}, 1000);</script></head>'
+	response += '<body><div style="margin-right: 0px"><b>On Stream:<b> '
+	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '</div>'
+	response += '<div><b>Up Next:<b> '
+	response += ', '.join(player_list[1:2]) if len(player_list) > 1 else 'None'
+	response += '</div></body></html>'
+	return response
+
 @app.route('/add/<name>')
 def add(name):
 	if name in player_list:
@@ -114,8 +124,8 @@ def siteclear():
                 return 'Auth failed'
         else:
 		while len(player_list) > 0:
-			player_list.pop()
-	return 'The list has been cleared'
+			player_list.pop()	
+		return 'The list has been cleared'
 
 @app.route('/drop/<name>')
 def drop(name):
