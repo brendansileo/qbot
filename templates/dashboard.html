@@ -60,7 +60,28 @@
 		function pronouns() {
 			token = getCookieValue('token')
 			pronounChoice = $('#pronounString').val()
-			$.post('/sitepronouns', {'token': token, 'pronouns': pronounChoice}, function(data){$('#pronounString').val('');console.log(data)}) 
+			$.post('/sitepronouns', {'token': token, 'pronouns': pronounChoice}, function(data){$('#pronounString').val('')}) 
+		}
+		
+		function win() {
+			token = getCookieValue('token')
+			$.post('/sitewin', {'token': token}, function(data){getList()})
+		}
+
+		function loss() {
+			token = getCookieValue('token')
+			$.post('/siteloss', {'token': token}, function(data){getList()})
+		}
+
+		function resetScore() {
+			token = getCookieValue('token')
+			$.post('/resetScore', {'token': token}, function(data){getList()})
+		}
+
+		function format() {
+			token = getCookieValue('token')
+			num = $('#formatNum').val()
+			$.post('/siteformat', {'token': token, 'format': num}, function(data){$('#formatNum').val('');getList()})
 		}
 
 		function showControls(name, token) {
@@ -196,7 +217,7 @@
 <div id="record"></div>
 <br><br><br><br>
 <div class="usercontrols" style="display:none"><button class="btn btn-info" onclick="add()">Challenge</button><button class="btn btn-info" onclick="drop()">Drop</button><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#pronounModal">Pronouns</button></div>
-<div class="admincontrols" style="display:none"><button class="btn btn-info" onclick="next()">Next</button><button class="btn btn-info" onclick="clearlist()">Clear</button></div>
+<div class="admincontrols" style="display:none"><button class="btn btn-info" onclick="next()">Next</button><button class="btn btn-info" onclick="clearlist()">Clear</button><button class="btn btn-info" onclick="win()">Game Win</button><button class="btn btn-info" onclick="loss()">Game Loss</button><button class="btn btn-info" onclick="resetScore()">Reset Score</button><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#formatModal">Format</button></div>
 <br><br><br><br>
 <h1>Viewer Battle List</h1>
 <p id="list" style="font-size:25px">Loading...</p>
@@ -219,6 +240,17 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="formatModal" tabindex="-1" aria-labelledby="formatModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="formatModalLabel">Set Format</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>      </div>
+      <div class="modal-body">        
+        <input type="text" id="formatNum"/>
+      </div>      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="format()">Save</button>      </div>    </div>  </div></div>
 
 </body>
 </html>

@@ -6,6 +6,9 @@ app = Flask(__name__)
 
 qa = QbotActions()
 player_list = []
+bestof = '5'
+gamescore = [0,0]
+
 
 @app.route('/')
 def dashboard():
@@ -19,7 +22,7 @@ def discord():
 def dash_list():
 	if len(player_list) == 0:
 		return 'The list is empty!'
-	response = '<b>On Stream:</b> <br>'
+	response = '<b>On Stream - '+getScore()+'</b> <br>'
 	response += player_list[0]+'<br>'
 	response += '<b>Up Next:</b><br>'
 	response += '<br>'.join(player_list[1:]) if len(player_list) > 1 else 'None'
@@ -57,10 +60,68 @@ def getRecord():
 	name = qa.get_name(token)
 	data = qa.db.read()
 	if name in data:
-	        response = str(data[name]['wins'])+'W-'+str(data[name]['losses'])+'L'	
+	        response = 'Your Record: '+str(data[name]['wins'])+'W-'+str(data[name]['losses'])+'L'	
 	else:
-		response = '0W-0L'
+		response = 'Your Record: 0W-0L'
 	return response
+
+@app.route('/getScore')
+def getScore():
+	return 'Bo'+bestof+': '+str(gamescore[0])+'-'+str(gamescore[1])
+
+@app.route('/sitewin', methods=['POST'])
+def sitewin():
+	global gamescore
+	token = request.form['token']
+        name = qa.get_name(token)
+        if name != 'its_mino_':
+		return 'Auth fail'
+	gamescore[0] += 1
+	if gamescore[0] >= int(int(bestof)/2) + 1:
+		gamescore = [0,0]
+		loss()
+		if len(player_list) > 1:
+			next()
+	return ''		
+
+@app.route('/siteloss', methods=['POST'])
+def siteloss():
+	global gamescore
+	token = request.form['token']
+        name = qa.get_name(token)
+        if name != 'its_mino_':
+                return 'Auth fail'
+	gamescore[1] += 1
+	if gamescore[1] >= int(int(bestof)/2) + 1:
+		gamescore = [0,0]
+		win()
+		if len(player_list) > 1:
+			next()
+	return ''
+
+@app.route('/resetScore', methods=['POST'])
+def resetScore():
+	global gamescore
+	token = request.form['token']
+	name = qa.get_name(token)
+        if name != 'its_mino_':
+		return 'Auth fail'
+	else:
+		gamescore = [0,0]
+		return ''
+
+@app.route('/siteformat', methods=['POST'])
+def siteformat():
+	global gamescore
+        global bestof
+	token = request.form['token']
+        name = qa.get_name(token)
+        if name != 'its_mino_':
+                return 'Auth fail'
+        else:
+		gamescore = [0,0]
+		bestof = request.form['format']
+	return ''
 
 @app.route('/list')
 def list():
