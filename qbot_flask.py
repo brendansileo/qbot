@@ -44,6 +44,8 @@ def verify():
 	if len(token) == 0 or len(name) == 0: 
 		return token+':'+name
 	data = requests.get('https://api.twitch.tv/helix/users', headers={'Client-Id': 'i2k8ufiwoixna3fcmdrt71ij386luw', 'Authorization': 'Bearer '+token})
+	if 'data' not in data.json():
+		return 'Old Auth'
 	if name == data.json()['data'][0]['display_name']:
 		return 'True'
 	else:
@@ -65,7 +67,7 @@ def list():
 	response = 'On Stream: '
 	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '         '
 	response += 'Up Next: '
-	response += ', '.join(player_list[1:2]) if len(player_list) > 1 else 'None'
+	response += ', '.join(player_list[1:]) if len(player_list) > 1 else 'None'
 	return response
 
 @app.route('/slobslist')
@@ -74,7 +76,7 @@ def slobslist():
 	response += '<body><div style="margin-right: 0px"><b>On Stream:<b> '
 	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '</div>'
 	response += '<div><b>Up Next:<b> '
-	response += ', '.join(player_list[1:2]) if len(player_list) > 1 else 'None'
+	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None')
 	response += '</div></body></html>'
 	return response
 
@@ -206,6 +208,19 @@ def pronouns(name, choice):
 	if name not in data:
 		data[name] = qa.db.new_user()
 	data[name]['pronouns'] = choice
+	qa.db.write(data)
+	response = 'Thank you @'+name+' for setting your pronouns!'
+	return response
+
+@app.route('/sitepronouns', methods=['POST'])
+def sitepronouns():
+	token = request.form['token']
+	pronouns = request.form['pronouns']
+	name = name = qa.get_name(token)
+	data = qa.db.read()
+	if name not in data:
+		data[name] = qa.db.new_user()
+	data[name]['pronouns'] = pronouns
 	qa.db.write(data)
 	response = 'Thank you @'+name+' for setting your pronouns!'
 	return response

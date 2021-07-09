@@ -57,6 +57,12 @@
 			$.post('/getRecord', {'token': token}, function(data){$('#record').html(data)})
 		}
 
+		function pronouns() {
+			token = getCookieValue('token')
+			pronounChoice = $('#pronounString').val()
+			$.post('/sitepronouns', {'token': token, 'pronouns': pronounChoice}, function(data){$('#pronounString').val('');console.log(data)}) 
+		}
+
 		function showControls(name, token) {
 			if(name == 'its_mino_'){
 				$('.admincontrols').show()
@@ -164,7 +170,17 @@
 		}
 		button{
 			margin-right: 15px;
-		}	
+		}
+		#chat {
+			float:right;
+			margin-right: 20%;
+			margin-top: 50px;
+			border: 2px solid #111
+		}
+		.btn-info {
+			background-color: #64adfa;
+			border-color: #64adfa;
+		}
 	</style>
 </head>
 <body>
@@ -174,15 +190,35 @@
 	<li><a href="/discord">Discord</a></li>
 	<li><a href="https://twitter.com/_its_mino_" URL>Twitter</a></li>
 </ul>
-<a id="login" style="display:none" href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read"><button>Login With Twitch</button></a>
+<iframe id="chat" src="https://www.twitch.tv/embed/its_mino_/chat?parent=itsmino.tk" height="700px"></iframe>
+<a id="login" style="display:none" href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read"><button class="btn btn-info">Login With Twitch</button></a>
 <p id="welcome" style="display:none"></p>
 <div id="record"></div>
 <br><br><br><br>
-<div class="usercontrols" style="display:none"><button onclick="add()">Challenge</button><button onclick="drop()">Drop</button></div></div>
-<div class="admincontrols" style="display:none"><button onclick="next()">Next</button><button onclick="clearlist()">Clear</button></div>
+<div class="usercontrols" style="display:none"><button class="btn btn-info" onclick="add()">Challenge</button><button class="btn btn-info" onclick="drop()">Drop</button><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#pronounModal">Pronouns</button></div>
+<div class="admincontrols" style="display:none"><button class="btn btn-info" onclick="next()">Next</button><button class="btn btn-info" onclick="clearlist()">Clear</button></div>
 <br><br><br><br>
 <h1>Viewer Battle List</h1>
 <p id="list" style="font-size:25px">Loading...</p>
+
+<div class="modal fade" id="pronounModal" tabindex="-1" aria-labelledby="pronounModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pronounModalLabel">Set Your Pronouns</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Which pronouns you would like to have shown when you play on stream?<br>
+	<input type="text" id="pronounString"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="pronouns()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
