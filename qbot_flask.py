@@ -76,7 +76,10 @@ def slobslist():
 	response += '<body><div style="margin-right: 0px"><b>On Stream:<b> '
 	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '</div>'
 	response += '<div><b>Up Next:<b> '
-	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None')
+	if len(player_list) > 1:
+		response += player_list[1]+' ('+qa.get_pronouns(player_list[0])+')' 
+	else:
+		response += 'None'
 	response += '</div></body></html>'
 	return response
 
