@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 qa = QbotActions()
 player_list = []
-bestof = '5'
+bestof = '3'
 gamescore = [0,0]
 
 
@@ -16,7 +16,7 @@ def dashboard():
 
 @app.route('/discord')
 def discord():
-	return redirect('https://discord.gg/2eqKB828GA')
+	return redirect('https://discord.gg/KWdrhEjf')
 
 @app.route('/dashlist')
 def dash_list():
@@ -68,6 +68,12 @@ def getRecord():
 @app.route('/getScore')
 def getScore():
 	return 'Bo'+bestof+': '+str(gamescore[0])+'-'+str(gamescore[1])
+
+@app.route('/slobsScore')
+def slobsScore():
+	response = '<html><head><script>setTimeout(function(){window.location.reload(1);}, 1000);</script></head>'
+	response += '<body>Bo'+bestof+': '+str(gamescore[0])+'-'+str(gamescore[1])+'</body></html>'
+	return response
 
 @app.route('/sitewin', methods=['POST'])
 def sitewin():
@@ -138,7 +144,7 @@ def slobslist():
 	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '</div>'
 	response += '<div><b>Up Next:<b> '
 	if len(player_list) > 1:
-		response += player_list[1]+' ('+qa.get_pronouns(player_list[0])+')' 
+		response += player_list[1]+' ('+qa.get_pronouns(player_list[1])+')' 
 	else:
 		response += 'None'
 	response += '</div></body></html>'

@@ -10,7 +10,6 @@ class QbotActions:
 	def get_pronouns(self, name):
 		data = self.db.read()
 		try:
-			print(data[name]['pronouns'])
 			return data[name]['pronouns']
 		except Exception as e:
 			print(e)
