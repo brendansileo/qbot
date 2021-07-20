@@ -327,7 +327,9 @@ def record(name):
 
 @app.route('/pronouns/<name>/<choice>')
 def pronouns(name, choice):
-	data = qa.db.read()
+	if choice.strip() == '':
+		return 'Please include your pronoun choice in the command (ex: !pronouns they/them)'
+	data = qa.db.read(
 	if name not in data:
 		data[name] = qa.db.new_user()
 	data[name]['pronouns'] = choice
