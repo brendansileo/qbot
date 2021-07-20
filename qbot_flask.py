@@ -24,8 +24,10 @@ def dash_list():
 	if len(player_list) == 0:
 		return 'The list is empty!'
 	response = '<b>On Stream - '+getScore()+'</b> <br>'
-	response += player_list[0]+'<br>'
+	response += player_list[0]+'<button class="admincontrols" onclick="dropButton(\''+player_list[0]+'\')">X</button><br>'
 	response += '<b>Up Next:</b><br>'
+	for name in player_list[1:]:
+		response += name+'<button class="admincontrols" onclick="dropButton(\''+name+'\')">X</button><br>'
 	response += '<br>'.join(player_list[1:]) if len(player_list) > 1 else 'None'
 	return Markup(response)
 
@@ -227,6 +229,25 @@ def sitedrop():
         except:
                 response = '@'+name+' is not in the list!'
         return response
+
+@app.route('/buttondrop', methods=['POST'])
+def buttondrop():
+	token = request.form['token']
+        name = qa.get_name(token)
+        if name != 'its_mino_':
+                return 'Auth failed'
+        else:
+		name = request.form['name']
+		player_list = qa.get_list()
+		token = request.form['token']
+		name = qa.get_name(token)
+		try:
+			player_list.remove(name)
+			response = 'Removed @'+name+' from the list'
+			qa.write_list(player_list)
+		except:
+			response = '@'+name+' is not in the list!'
+	return response
 
 @app.route('/next')
 def next():

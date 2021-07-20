@@ -43,6 +43,11 @@
 			token = getCookieValue('token')	
 			$.post('/sitedrop', {'token': token}, function(data){getList()})	
 		}
+		
+		function dropButton(name) {
+			token = getCookieValue('token')
+			$.post('/buttondrop', {'token': token, 'name': name}, function(data){getList()})
+		}
 
 		const getCookieValue = (name) => (
 			document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
