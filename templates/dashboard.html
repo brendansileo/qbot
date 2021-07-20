@@ -29,6 +29,11 @@
 			$.post('/sitenext', {'token': token}, function(data){getList()})
 		}
 
+		function secondNext() {
+			token = getCookieValue('token')
+			$.post('/secondnext', {'token': token}, function(data){getList()})
+		}
+
 		function clearlist() {
 			token = getCookieValue('token')
 			$.post('/siteclear', {'token': token}, function(data){getList()})
@@ -88,10 +93,7 @@
 			if(name == 'its_mino_'){
 				$('.admincontrols').show()
 			}
-			else{
-				$('.usercontrols').show()
-			}
-			var interval = window.setInterval(function(){getRecord()}, 1000)
+			$('.usercontrols').show()
 			$('#welcome').html('Welcome ' + name +'!')                                       
 			$('#welcome').show()
 		}
@@ -214,10 +216,9 @@
 <iframe id="chat" src="https://www.twitch.tv/embed/its_mino_/chat?parent=itsmino.tk" height="700px"></iframe>
 <a id="login" style="display:none" href="https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=i2k8ufiwoixna3fcmdrt71ij386luw&redirect_uri=https://itsmino.tk/auth&scope=user_read"><button class="btn btn-info">Login With Twitch</button></a>
 <p id="welcome" style="display:none"></p>
-<div id="record"></div>
 <br><br><br><br>
 <div class="usercontrols" style="display:none"><button class="btn btn-info" onclick="add()">Challenge</button><button class="btn btn-info" onclick="drop()">Drop</button><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#pronounModal">Pronouns</button></div>
-<div class="admincontrols" style="display:none"><button class="btn btn-info" onclick="next()">Next</button><button class="btn btn-info" onclick="clearlist()">Clear</button><button class="btn btn-info" onclick="win()">Game Win</button><button class="btn btn-info" onclick="loss()">Game Loss</button><button class="btn btn-info" onclick="resetScore()">Reset Score</button><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#formatModal">Format</button></div>
+<div class="admincontrols" style="display:none"><button class="btn btn-info" onclick="next()">Next</button><button class="btn btn-info" onclick="clearlist()">Clear</button><button class="btn btn-info" onclick="win()">Game Win</button><button class="btn btn-info" onclick="loss()">Game Loss</button><button class="btn btn-info" onclick="resetScore()">Reset Score</button><button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#formatModal">Format</button><button class="btn btn-info" onclick="secondNext()">Second Next</button></div>
 <br><br><br><br>
 <h1>Viewer Battle List</h1>
 <p id="list" style="font-size:25px">Loading...</p>

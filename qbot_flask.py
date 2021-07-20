@@ -5,14 +5,14 @@ from qbot_actions import QbotActions
 app = Flask(__name__)
 
 qa = QbotActions()
-player_list = []
-bestof = '3'
+bestof = '1'
 gamescore = [0,0]
-
+format = 'viewerbattles'
 
 @app.route('/')
 def dashboard():
-	return render_template('dashboard.html')
+	if format == 'viewerbattles':
+		return render_template('dashboard.html')
 
 @app.route('/discord')
 def discord():
@@ -20,6 +20,7 @@ def discord():
 
 @app.route('/dashlist')
 def dash_list():
+	player_list = qa.get_list()
 	if len(player_list) == 0:
 		return 'The list is empty!'
 	response = '<b>On Stream - '+getScore()+'</b> <br>'
@@ -131,6 +132,7 @@ def siteformat():
 
 @app.route('/list')
 def list():
+	player_list = qa.get_list()
 	response = 'On Stream: '
 	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '         '
 	response += 'Up Next: '
@@ -139,10 +141,11 @@ def list():
 
 @app.route('/slobslist')
 def slobslist():
+	player_list = qa.get_list()
 	response = '<html><head><script>setTimeout(function(){window.location.reload(1);}, 1000);</script></head>'
 	response += '<body><div style="margin-right: 0px"><b>On Stream:<b> '
 	response += (player_list[0]+' ('+qa.get_pronouns(player_list[0])+')' if len(player_list) > 0 else 'None') + '</div>'
-	response += '<div><b>Up Next:<b> '
+	response += '<div><b>Versus:<b> '
 	if len(player_list) > 1:
 		response += player_list[1]+' ('+qa.get_pronouns(player_list[1])+')' 
 	else:
@@ -152,6 +155,7 @@ def slobslist():
 
 @app.route('/add/<name>')
 def add(name):
+	player_list = qa.get_list()
 	if name in player_list:
 		response = '@'+name+' you are already in the list!'
 	else:
@@ -162,11 +166,13 @@ def add(name):
 		elif i == 1:
 			response = '@'+name+' you are up next!'
 		else:
-			response = '@'+name+' you will be up in '+str(i)+' matches!'
+			response = '@'+name+' you will be up in '+str(i-1)+' matches!'
+		qa.write_list(player_list)
 	return response
 
 @app.route('/siteadd', methods=['POST'])
 def siteadd():
+	player_list = qa.get_list()
 	token = request.form['token']
 	name = qa.get_name(token)
 	if name in player_list:
@@ -180,12 +186,12 @@ def siteadd():
                         response = '@'+name+' you are up next!'
                 else:
                         response = '@'+name+' you will be up in '+str(i)+' matches!'
+		qa.write_list(player_list)
         return response	
 
 @app.route('/clear')
 def clear():
-	while len(player_list) > 0:
-		player_list.pop()
+	qa.write_list([])
 	return 'The list has been cleared'
 
 @app.route('/siteclear', methods=['POST'])
@@ -195,40 +201,46 @@ def siteclear():
         if name != 'its_mino_':
                 return 'Auth failed'
         else:
-		while len(player_list) > 0:
-			player_list.pop()	
+		qa.write_list([])
 		return 'The list has been cleared'
 
 @app.route('/drop/<name>')
 def drop(name):
+	player_list = qa.get_list()
 	try:
 		player_list.remove(name)
 		response = 'Removed @'+name+' from the list'
 	except:
 		response = '@'+name+' is not in the list!'
+	qa.write_list(player_list)
 	return response
 
 @app.route('/sitedrop', methods=['POST'])
 def sitedrop():
+	player_list = qa.get_list()
 	token = request.form['token']
 	name = qa.get_name(token)
 	try:
                 player_list.remove(name)
                 response = 'Removed @'+name+' from the list'
+		qa.write_list(player_list)
         except:
                 response = '@'+name+' is not in the list!'
         return response
 
 @app.route('/next')
 def next():
+	player_list = qa.get_list()
 	last = player_list.pop(0)
 	response = 'Thanks for playing @'+last+'!'
 	if len(player_list) > 0:
 		 response += ' @'+player_list[0]+' is up next!'
+	qa.write_list(player_list)
 	return response
 
 @app.route('/sitenext', methods=['POST'])
 def sitenext():
+	player_list = qa.get_list()
 	token = request.form['token']
 	name = qa.get_name(token)
 	if name != 'its_mino_':
@@ -238,10 +250,29 @@ def sitenext():
 	        response = 'Thanks for playing @'+last+'!' 
 	 	if len(player_list) > 0:                
 			response += ' @'+player_list[0]+' is up next!'
-	        return response
+		player_list.append(last)
+		qa.write_list(player_list)
+		return response
+
+@app.route('/secondnext', methods=['POST'])
+def secondnext():
+	player_list = qa.get_list()
+        token = request.form['token']
+        name = qa.get_name(token)
+        if name != 'its_mino_':
+                return 'Auth failed'
+        else:
+                last = player_list.pop(1)
+                response = 'Thanks for playing @'+last+'!'
+                if len(player_list) > 0:
+                        response += ' @'+player_list[0]+' is up next!'
+		player_list.append(last)
+		qa.write_list(player_list)
+                return response
 
 @app.route('/win')
 def win():
+	player_list = qa.get_list()
 	last = player_list[0]
 	data = qa.db.read()
 	if last not in data:
@@ -253,6 +284,7 @@ def win():
 
 @app.route('/loss')
 def loss():
+	player_list = qa.get_list()
 	last = player_list[0]
 	data = qa.db.read()
 	if last not in data:
